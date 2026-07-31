@@ -77,6 +77,22 @@ class CustomerDashboardScreen extends StatelessWidget {
                               ],
                             ),
                           ),
+                          // AI Assistant
+                          Container(
+                            margin: const EdgeInsets.only(right: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.auto_awesome_rounded,
+                                color: Colors.white,
+                              ),
+                              onPressed: () => context.go('/ai-assistant'),
+                              tooltip: 'AI Assistant',
+                            ),
+                          ),
                           Stack(
                             children: [
                               IconButton(

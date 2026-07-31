@@ -56,7 +56,25 @@
 - [x] Booking overview
 - [x] Revenue tracking
 
-## Phase 8: Post-MVP Improvements (Future)
+## Phase 8: AI Assistant & Smart Service Request ✅
+- [x] AI service engine with 10-service-category knowledge base (Plumbing, Electrical, Carpentry, Cleaning, Painting, Appliance Repair, Gardening, Pest Control, Security System, Moving & Shifting)
+- [x] Keyword-based problem detection & category matching
+- [x] Intelligent follow-up questions (up to 2 clarification rounds)
+- [x] Trust-score-based professional recommendation (rating, verification, availability, job count)
+- [x] Cost estimation (NPR range per category with uncertainty disclaimer)
+- [x] Maintenance tips per category
+- [x] Action-oriented replies (View Experts / Create Request / My Bookings)
+- [x] Image attachment support
+- [x] AI Chat screen with animated typing indicator
+- [x] Quick suggestion chips (leaking sink, AC not cooling, cost estimate, show plumbers, tips)
+- [x] Rich message bubbles with professional chips & action buttons
+- [x] AI Assistant button in customer dashboard header
+- [x] Route: `/ai-assistant`
+- [x] `AIAssistantService` registered in `MultiProvider`
+- [x] Analyzer clean: 0 errors, 0 warnings
+- [x] Build verification: `flutter build web --release` passes
+
+## Phase 9: Post-MVP Improvements (Future)
 - [ ] Firebase real backend integration
 - [ ] Payment gateway integration
 - [ ] Google Maps integration
@@ -65,5 +83,4 @@
 - [ ] Unit & widget tests
 - [ ] CI/CD pipeline
 - [ ] Performance optimization
-- [ ] AI Assistant integration
 - [ ] Business account management screens

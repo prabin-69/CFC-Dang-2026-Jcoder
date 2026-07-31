@@ -7,6 +7,7 @@ import 'services/professional_service.dart';
 import 'services/booking_service.dart';
 import 'services/chat_service.dart';
 import 'services/notification_service.dart';
+import 'services/ai_service.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,7 @@ class WorkLinkApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BookingService()),
         ChangeNotifierProvider(create: (_) => ChatService()),
         ChangeNotifierProvider(create: (_) => NotificationService()),
+        ChangeNotifierProvider(create: (_) => AIAssistantService()),
       ],
       child: MaterialApp.router(
         title: 'WorkLink',

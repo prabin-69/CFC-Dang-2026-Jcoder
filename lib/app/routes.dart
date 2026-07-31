@@ -22,6 +22,7 @@ import '../features/chat/chat_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/notifications/notification_screen.dart';
 import '../features/admin/admin_dashboard_screen.dart';
+import '../features/ai/ai_assistant_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -117,6 +118,10 @@ final GoRouter appRouter = GoRouter(
         final professionalId = state.pathParameters['professionalId'] ?? '';
         return BookingScreen(professionalId: professionalId);
       },
+    ),
+    GoRoute(
+      path: '/ai-assistant',
+      builder: (context, state) => const AiAssistantScreen(),
     ),
     GoRoute(
       path: '/create-service-request',
