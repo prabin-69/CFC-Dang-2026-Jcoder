@@ -1,6 +1,7 @@
 class AppConstants {
   static const String appName = 'WorkLink';
-  static const String tagline = 'Connect Skills. Solve Problems. Build Opportunities.';
+  static const String tagline =
+      'Connect Skills. Solve Problems. Build Opportunities.';
   static const String appVersion = '1.0.0';
 
   // Shared Preferences Keys
@@ -29,9 +30,19 @@ class AppConstants {
   static const String bookingCancelled = 'cancelled';
 
   // User Roles
+  static const String roleGuest = 'guest';
   static const String roleCustomer = 'customer';
   static const String roleProfessional = 'professional';
+  static const String roleBusiness = 'business';
   static const String roleAdmin = 'admin';
+
+  // Guest Restricted Actions
+  static const String actionBook = 'book';
+  static const String actionChat = 'chat';
+  static const String actionCreateRequest = 'create_request';
+  static const String actionSaveFavorite = 'save_favorite';
+  static const String actionReview = 'review';
+  static const String actionPayment = 'payment';
 
   // Pagination
   static const int pageSize = 20;

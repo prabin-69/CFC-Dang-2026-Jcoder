@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../core/colors.dart';
+import '../../core/constants.dart';
 import '../../core/utils.dart';
+import '../../services/auth_service.dart';
 import '../../services/professional_service.dart';
 import '../../services/booking_service.dart';
 
@@ -90,9 +92,15 @@ class _BookingScreenState extends State<BookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = context.watch<AuthService>();
     final professional = context
         .watch<ProfessionalService>()
         .getProfessionalById(widget.professionalId);
+
+    // Guest guard
+    if (authService.guardAction(context, AppConstants.actionBook)) {
+      return const SizedBox.shrink();
+    }
 
     if (professional == null) {
       return Scaffold(
@@ -215,7 +223,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
-                        value: _selectedTime,
+                        initialValue: _selectedTime,
                         items: _timeSlots
                             .map(
                               (t) => DropdownMenuItem(value: t, child: Text(t)),
@@ -336,7 +344,7 @@ class _BookingScreenState extends State<BookingScreen> {
           color: AppColors.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/professional_model.dart';
-import '../core/utils.dart';
 
 class ProfessionalService extends ChangeNotifier {
   final List<ProfessionalModel> _professionals = [];
   final List<ProfessionalModel> _featuredProfessionals = [];
-  bool _isLoading = false;
+  final bool _isLoading = false;
   String _searchQuery = '';
   String _selectedCategory = '';
   String _selectedSortBy = 'rating';

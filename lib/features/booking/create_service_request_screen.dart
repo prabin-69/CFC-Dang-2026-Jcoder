@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/colors.dart';
+import '../../core/constants.dart';
 import '../../core/utils.dart';
+import '../../services/auth_service.dart';
 import '../../services/booking_service.dart';
 
 class CreateServiceRequestScreen extends StatefulWidget {
@@ -23,7 +25,7 @@ class _CreateServiceRequestScreenState
   String? _preferredDate;
   String _budgetRange = '';
   String? _location;
-  List<String> _imageUrls = [];
+  final List<String> _imageUrls = [];
   bool _isLoading = false;
 
   final List<String> _categories = [
@@ -85,6 +87,13 @@ class _CreateServiceRequestScreenState
 
   @override
   Widget build(BuildContext context) {
+    final authService = context.watch<AuthService>();
+
+    // Guest guard
+    if (authService.guardAction(context, AppConstants.actionCreateRequest)) {
+      return const SizedBox.shrink();
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Describe Your Problem')),
       body: Form(
@@ -117,7 +126,7 @@ class _CreateServiceRequestScreenState
                       'Describe your problem and nearby professionals will send you quotations!',
                       style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.primaryDark.withOpacity(0.7),
+                        color: AppColors.primaryDark.withValues(alpha: 0.7),
                         height: 1.4,
                       ),
                     ),
@@ -135,7 +144,7 @@ class _CreateServiceRequestScreenState
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               items: _categories
                   .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                   .toList(),
@@ -277,7 +286,7 @@ class _CreateServiceRequestScreenState
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: _preferredDate,
+              initialValue: _preferredDate,
               items: [
                 'Today',
                 'Tomorrow',
@@ -300,7 +309,7 @@ class _CreateServiceRequestScreenState
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: _budgetRange.isEmpty ? null : _budgetRange,
+              initialValue: _budgetRange.isEmpty ? null : _budgetRange,
               items: _budgetRanges
                   .map((b) => DropdownMenuItem(value: b, child: Text(b)))
                   .toList(),
@@ -321,7 +330,7 @@ class _CreateServiceRequestScreenState
           color: AppColors.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),

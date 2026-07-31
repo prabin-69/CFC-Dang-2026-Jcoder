@@ -1,5 +1,3 @@
-import 'user_model.dart';
-
 class ProfessionalModel {
   final String id;
   final String userId;

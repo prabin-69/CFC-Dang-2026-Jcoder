@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../core/constants.dart';
+import '../services/auth_service.dart';
 import '../features/splash/splash_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/auth/auth_screen.dart';
 import '../features/auth/otp_verification_screen.dart';
+import '../features/auth/profile_completion_screen.dart';
 import '../features/home/home_screen.dart';
-import '../features/professionals/professional_list_screen.dart';
+import '../features/home/customer_dashboard_screen.dart';
+import '../features/home/professional_dashboard_screen.dart';
 import '../features/professionals/professional_detail_screen.dart';
 import '../features/booking/booking_screen.dart';
 import '../features/booking/create_service_request_screen.dart';
@@ -17,11 +22,8 @@ import '../features/chat/chat_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/notifications/notification_screen.dart';
 import '../features/admin/admin_dashboard_screen.dart';
-import '../core/constants.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorKey =
-    GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -40,19 +42,36 @@ final GoRouter appRouter = GoRouter(
         return OtpVerificationScreen(phone: phone);
       },
     ),
+    GoRoute(
+      path: '/profile-completion',
+      builder: (context, state) => const ProfileCompletionScreen(),
+    ),
+
+    // --- Role-based Shell ---
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return HomeScreen(navigationShell: navigationShell);
       },
       branches: [
+        // Branch 0: Home/Dashboard (role-aware)
         StatefulShellBranch(
           routes: [
             GoRoute(
               path: '/home',
-              builder: (context, state) => const ProfessionalListScreen(),
+              builder: (context, state) {
+                final authService = context.watch<AuthService>();
+                final role = authService.currentRole;
+                if (role == AppConstants.roleProfessional ||
+                    role == AppConstants.roleBusiness) {
+                  return const ProfessionalDashboardScreen();
+                }
+                return const CustomerDashboardScreen();
+              },
             ),
           ],
         ),
+
+        // Branch 1: Bookings (customer) / Jobs (professional) / Team (business)
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -61,6 +80,8 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
+
+        // Branch 2: Chat
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -69,6 +90,8 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
+
+        // Branch 3: Profile
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -79,6 +102,8 @@ final GoRouter appRouter = GoRouter(
         ),
       ],
     ),
+
+    // --- Detail Routes ---
     GoRoute(
       path: '/professional-detail/:id',
       builder: (context, state) {

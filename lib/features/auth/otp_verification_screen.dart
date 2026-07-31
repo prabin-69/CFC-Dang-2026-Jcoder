@@ -76,7 +76,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
     if (mounted) {
       if (success) {
-        context.go('/home');
+        context.go('/profile-completion');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

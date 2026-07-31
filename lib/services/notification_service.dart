@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../core/utils.dart';
 
 class AppNotification {
   final String id;

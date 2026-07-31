@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/colors.dart';
+import '../../core/constants.dart';
 import '../../core/utils.dart';
 import '../../models/chat_message_model.dart';
+import '../../services/auth_service.dart';
 import '../../services/chat_service.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -57,9 +59,15 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = context.watch<AuthService>();
     final chatService = context.watch<ChatService>();
     final chat = chatService.getChatById(widget.chatId);
     final messages = chatService.getMessages(widget.chatId);
+
+    // Guest guard
+    if (authService.guardAction(context, AppConstants.actionChat)) {
+      return const SizedBox.shrink();
+    }
 
     if (chat == null) {
       return Scaffold(
@@ -142,7 +150,7 @@ class _ChatScreenState extends State<ChatScreen> {
               color: AppColors.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -5),
                 ),
@@ -227,7 +235,7 @@ class _ChatScreenState extends State<ChatScreen> {
               style: TextStyle(
                 fontSize: 11,
                 color: isMe
-                    ? Colors.white.withOpacity(0.7)
+                    ? Colors.white.withValues(alpha: 0.7)
                     : AppColors.textHint,
               ),
             ),
