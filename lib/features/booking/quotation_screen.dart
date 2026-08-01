@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/colors.dart';
 import '../../core/utils.dart';
+import '../../app/providers.dart';
 import '../../services/booking_service.dart';
 import '../../models/service_request_model.dart';
 
-class QuotationScreen extends StatelessWidget {
+class QuotationScreen extends ConsumerWidget {
   final String requestId;
 
   const QuotationScreen({super.key, required this.requestId});
 
   @override
-  Widget build(BuildContext context) {
-    final bookingService = context.watch<BookingService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bookingService = ref.watch(bookingServiceProvider);
     final request = bookingService.getServiceRequestById(requestId);
     final quotations = bookingService.getQuotationsForRequest(requestId);
 
@@ -211,7 +212,7 @@ class QuotationScreen extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withOpacity(0.1),
+                  color: AppColors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Row(
@@ -252,7 +253,7 @@ class _Tag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(

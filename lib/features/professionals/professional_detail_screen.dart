@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import '../../core/colors.dart';
 import '../../core/utils.dart';
-import '../../services/professional_service.dart';
+import '../../app/providers.dart';
 
-class ProfessionalDetailScreen extends StatelessWidget {
+class ProfessionalDetailScreen extends ConsumerWidget {
   final String professionalId;
 
   const ProfessionalDetailScreen({super.key, required this.professionalId});
 
   @override
-  Widget build(BuildContext context) {
-    final professionalService = context.watch<ProfessionalService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final professionalService = ref.watch(professionalServiceProvider);
     final professional = professionalService.getProfessionalById(
       professionalId,
     );
@@ -48,7 +48,7 @@ class ProfessionalDetailScreen extends StatelessWidget {
                     const Spacer(),
                     CircleAvatar(
                       radius: 50,
-                      backgroundColor: Colors.white.withOpacity(0.2),
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
                       child: Text(
                         professional.name[0].toUpperCase(),
                         style: const TextStyle(
@@ -75,7 +75,7 @@ class ProfessionalDetailScreen extends StatelessWidget {
                           professional.category,
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha: 0.8),
                           ),
                         ),
                         if (professional.isVerified) ...[
@@ -215,7 +215,7 @@ class ProfessionalDetailScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.secondary.withOpacity(0.1),
+                          color: AppColors.secondary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Column(
@@ -243,7 +243,7 @@ class ProfessionalDetailScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Column(
@@ -321,7 +321,7 @@ class ProfessionalDetailScreen extends StatelessWidget {
                                   rating: review.rating,
                                   itemCount: 5,
                                   itemSize: 14,
-                                  itemBuilder: (_, __) => const Icon(
+                                  itemBuilder: (_, _) => const Icon(
                                     Icons.star,
                                     color: AppColors.warning,
                                   ),
@@ -363,7 +363,7 @@ class ProfessionalDetailScreen extends StatelessWidget {
           color: AppColors.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -381,7 +381,7 @@ class ProfessionalDetailScreen extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () => context.go('/chat/chat${professionalId}'),
+                  onPressed: () => context.go('/chat/chat$professionalId'),
                   icon: const Icon(Icons.chat_rounded, size: 18),
                   label: const Text('Chat'),
                 ),

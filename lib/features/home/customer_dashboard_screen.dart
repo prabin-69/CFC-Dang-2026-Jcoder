@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
 import '../../core/utils.dart';
-import '../../services/auth_service.dart';
-import '../../services/professional_service.dart';
-import '../../services/booking_service.dart';
-import '../../services/notification_service.dart';
+import '../../app/providers.dart';
 
-class CustomerDashboardScreen extends StatelessWidget {
+class CustomerDashboardScreen extends ConsumerWidget {
   const CustomerDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final authService = context.watch<AuthService>();
-    final professionalService = context.watch<ProfessionalService>();
-    final bookingService = context.watch<BookingService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authService = ref.watch(authServiceProvider);
+    final professionalService = ref.watch(professionalServiceProvider);
+    final bookingService = ref.watch(bookingServiceProvider);
     final professionals = professionalService.professionals;
     final featured = professionalService.featuredProfessionals;
     final activeBookings = bookingService.bookings
@@ -71,7 +68,7 @@ class CustomerDashboardScreen extends StatelessWidget {
                                   'What service do you need today?',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Colors.white.withOpacity(0.8),
+                                    color: Colors.white.withValues(alpha: 0.8),
                                   ),
                                 ),
                               ],
@@ -81,7 +78,7 @@ class CustomerDashboardScreen extends StatelessWidget {
                           Container(
                             margin: const EdgeInsets.only(right: 4),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: IconButton(
@@ -102,8 +99,8 @@ class CustomerDashboardScreen extends StatelessWidget {
                                 ),
                                 onPressed: () => context.go('/notifications'),
                               ),
-                              if (context
-                                  .watch<NotificationService>()
+                              if (ref
+                                  .watch(notificationServiceProvider)
                                   .notifications
                                   .any((n) => !n.isRead))
                                 Positioned(
@@ -168,7 +165,7 @@ class CustomerDashboardScreen extends StatelessWidget {
               ),
             ),
           ),
-          SliverToBoxAdapter(child: _buildCategoriesGrid(context)),
+          SliverToBoxAdapter(child: _buildCategoriesGrid(context, ref)),
 
           // Active Bookings
           if (activeBookings.isNotEmpty) ...[
@@ -214,7 +211,7 @@ class CustomerDashboardScreen extends StatelessWidget {
                           color: AppColors.surface,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppColors.border.withOpacity(0.5),
+                            color: AppColors.border.withValues(alpha: 0.5),
                           ),
                         ),
                         child: Column(
@@ -312,10 +309,10 @@ class CustomerDashboardScreen extends StatelessWidget {
                         margin: const EdgeInsets.only(right: 12),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.warning.withOpacity(0.05),
+                          color: AppColors.warning.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppColors.warning.withOpacity(0.2),
+                            color: AppColors.warning.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Column(
@@ -397,7 +394,7 @@ class CustomerDashboardScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.3),
+                              color: AppColors.primary.withValues(alpha: 0.3),
                               blurRadius: 16,
                               offset: const Offset(0, 6),
                             ),
@@ -408,7 +405,9 @@ class CustomerDashboardScreen extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 24,
-                              backgroundColor: Colors.white.withOpacity(0.2),
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.2,
+                              ),
                               child: Text(
                                 pro.name[0].toUpperCase(),
                                 style: const TextStyle(
@@ -431,7 +430,7 @@ class CustomerDashboardScreen extends StatelessWidget {
                               pro.category,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -584,7 +583,7 @@ class CustomerDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoriesGrid(BuildContext context) {
+  Widget _buildCategoriesGrid(BuildContext context, WidgetRef ref) {
     final categories = [
       _CategoryItem('Plumbing', Icons.plumbing_rounded, AppColors.primary),
       _CategoryItem(
@@ -618,7 +617,9 @@ class CustomerDashboardScreen extends StatelessWidget {
           final cat = categories[index];
           return GestureDetector(
             onTap: () {
-              context.read<ProfessionalService>().setSelectedCategory(cat.name);
+              ref
+                  .read(professionalServiceProvider)
+                  .setSelectedCategory(cat.name);
               context.go('/home');
             },
             child: Container(
@@ -626,7 +627,9 @@ class CustomerDashboardScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border.withOpacity(0.5)),
+                border: Border.all(
+                  color: AppColors.border.withValues(alpha: 0.5),
+                ),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -635,7 +638,7 @@ class CustomerDashboardScreen extends StatelessWidget {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: cat.color.withOpacity(0.1),
+                      color: cat.color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(cat.icon, color: cat.color, size: 24),
@@ -703,7 +706,7 @@ class _DashboardSearchDelegate extends SliverPersistentHeaderDelegate {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Icon(

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
 import '../../core/utils.dart';
-import '../../services/booking_service.dart';
+import '../../app/providers.dart';
 
-class MyBookingsScreen extends StatefulWidget {
+class MyBookingsScreen extends ConsumerStatefulWidget {
   const MyBookingsScreen({super.key});
 
   @override
-  State<MyBookingsScreen> createState() => _MyBookingsScreenState();
+  ConsumerState<MyBookingsScreen> createState() => _MyBookingsScreenState();
 }
 
-class _MyBookingsScreenState extends State<MyBookingsScreen>
+class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -30,7 +30,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final bookingService = context.watch<BookingService>();
+    final bookingService = ref.watch(bookingServiceProvider);
     final bookings = bookingService.bookings;
     final requests = bookingService.serviceRequests;
 
@@ -143,7 +143,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                         decoration: BoxDecoration(
                           color: AppUtils.getStatusColor(
                             booking.status,
-                          ).withOpacity(0.1),
+                          ).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -273,7 +273,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                         decoration: BoxDecoration(
                           color: AppUtils.getStatusColor(
                             request.status,
-                          ).withOpacity(0.1),
+                          ).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(

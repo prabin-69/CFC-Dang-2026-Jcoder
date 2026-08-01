@@ -5,7 +5,7 @@ import '../core/utils.dart';
 class ChatService extends ChangeNotifier {
   final List<ChatModel> _chats = [];
   final Map<String, List<ChatMessageModel>> _messages = {};
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   List<ChatModel> get chats {
     return List.from(_chats)..sort((a, b) {

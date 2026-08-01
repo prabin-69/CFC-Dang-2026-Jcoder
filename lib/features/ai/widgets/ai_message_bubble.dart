@@ -160,7 +160,7 @@ class AiMessageBubble extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border.withOpacity(0.5)),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
         ),
         child: Row(
           children: [
@@ -239,7 +239,7 @@ class AiMessageBubble extends StatelessWidget {
       case AiActionType.viewBookings:
         icon = Icons.book_online_rounded;
         color = AppColors.warning;
-        bgColor = AppColors.warning.withOpacity(0.1);
+        bgColor = AppColors.warning.withValues(alpha: 0.1);
         break;
       case AiActionType.none:
         icon = Icons.arrow_forward_rounded;
@@ -257,7 +257,7 @@ class AiMessageBubble extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: color,
           backgroundColor: bgColor,
-          side: BorderSide(color: color.withOpacity(0.2)),
+          side: BorderSide(color: color.withValues(alpha: 0.2)),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

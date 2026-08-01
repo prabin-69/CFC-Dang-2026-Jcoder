@@ -43,3 +43,28 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# ─────────────────────────────────────────────
+# SECURITY: Never commit .env files or secrets
+# ─────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.env
+**/config/secrets*
+**/config/*.key
+**/config/*.pem
+**/config/*.cert
+
+# Node.js
+node_modules/
+backend/dist/
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# IDE
+.idea/
+*.sublime-*
+*.swp
+*.swo
+*~

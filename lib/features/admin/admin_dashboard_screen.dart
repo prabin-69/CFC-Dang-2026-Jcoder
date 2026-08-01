@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/colors.dart';
 import '../../core/utils.dart';
-import '../../services/professional_service.dart';
-import '../../services/booking_service.dart';
+import '../../app/providers.dart';
 
-class AdminDashboardScreen extends StatelessWidget {
+class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final professionalService = context.watch<ProfessionalService>();
-    final bookingService = context.watch<BookingService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final professionalService = ref.watch(professionalServiceProvider);
+    final bookingService = ref.watch(bookingServiceProvider);
     final professionals = professionalService.professionals;
     final bookings = bookingService.bookings;
     final requests = bookingService.serviceRequests;
@@ -47,7 +46,7 @@ class AdminDashboardScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -63,7 +62,7 @@ class AdminDashboardScreen extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Text(
@@ -85,7 +84,7 @@ class AdminDashboardScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'Managing ${professionals.length} professionals',
-                  style: TextStyle(color: Colors.white.withOpacity(0.8)),
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
                 ),
               ],
             ),
@@ -146,7 +145,9 @@ class AdminDashboardScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border.withOpacity(0.5)),
+              border: Border.all(
+                color: AppColors.border.withValues(alpha: 0.5),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,7 +194,7 @@ class AdminDashboardScreen extends StatelessWidget {
                     leading: CircleAvatar(
                       backgroundColor: AppUtils.getStatusColor(
                         booking.status,
-                      ).withOpacity(0.1),
+                      ).withValues(alpha: 0.1),
                       child: Icon(
                         AppUtils.getStatusIcon(booking.status),
                         color: AppUtils.getStatusColor(booking.status),
@@ -281,7 +282,7 @@ class _AdminStatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border.withOpacity(0.5)),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,7 +290,7 @@ class _AdminStatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 24),

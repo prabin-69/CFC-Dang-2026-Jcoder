@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
 import '../../core/constants.dart';
 import '../../core/utils.dart';
-import '../../services/auth_service.dart';
+import '../../app/providers.dart';
 
-class ProfileCompletionScreen extends StatefulWidget {
+class ProfileCompletionScreen extends ConsumerStatefulWidget {
   const ProfileCompletionScreen({super.key});
 
   @override
-  State<ProfileCompletionScreen> createState() =>
+  ConsumerState<ProfileCompletionScreen> createState() =>
       _ProfileCompletionScreenState();
 }
 
-class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
+class _ProfileCompletionScreenState
+    extends ConsumerState<ProfileCompletionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _skillController = TextEditingController();
@@ -43,7 +44,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
   Future<void> _completeProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final authService = context.read<AuthService>();
+    final authService = ref.read(authServiceProvider);
     await authService.updateProfile(
       name: _nameController.text.trim(),
       location: _selectedLocation,
@@ -84,7 +85,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Icon(
@@ -107,7 +108,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
                     'Tell us about yourself to get started',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -186,7 +187,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: _selectedLocation,
+                initialValue: _selectedLocation,
                 items: _locations
                     .map((l) => DropdownMenuItem(value: l, child: Text(l)))
                     .toList(),
@@ -358,7 +359,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
                     child: Text(
                       'No skills added yet. Type a skill and tap +',
                       style: TextStyle(
-                        color: AppColors.textHint.withOpacity(0.7),
+                        color: AppColors.textHint.withValues(alpha: 0.7),
                         fontSize: 13,
                       ),
                     ),
@@ -373,7 +374,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: _experience,
+                initialValue: _experience,
                 items:
                     [
                           'Less than 1 year',
@@ -514,7 +515,7 @@ class _RoleCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withOpacity(0.05)
+              ? AppColors.primary.withValues(alpha: 0.05)
               : AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(

@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
-import '../../services/auth_service.dart';
+import '../../app/providers.dart';
 
-class OtpVerificationScreen extends StatefulWidget {
+class OtpVerificationScreen extends ConsumerStatefulWidget {
   final String phone;
 
   const OtpVerificationScreen({super.key, required this.phone});
 
   @override
-  State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
+  ConsumerState<OtpVerificationScreen> createState() =>
+      _OtpVerificationScreenState();
 }
 
-class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
+class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
   final List<TextEditingController> _controllers = List.generate(
     6,
     (_) => TextEditingController(),
@@ -71,7 +72,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     final otp = _controllers.map((c) => c.text).join();
     if (otp.length != 6) return;
 
-    final authService = context.read<AuthService>();
+    final authService = ref.read(authServiceProvider);
     final success = await authService.verifyOtp(widget.phone, otp);
 
     if (mounted) {
@@ -90,7 +91,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authService = context.watch<AuthService>();
+    final authService = ref.watch(authServiceProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Verify Phone')),

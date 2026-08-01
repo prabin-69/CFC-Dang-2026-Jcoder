@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
-import '../../services/auth_service.dart';
-import '../../services/booking_service.dart';
+import '../../app/providers.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final authService = context.watch<AuthService>();
-    final bookingService = context.watch<BookingService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authService = ref.watch(authServiceProvider);
+    final bookingService = ref.watch(bookingServiceProvider);
+    final themeService = ref.watch(themeServiceProvider);
     final user = authService.currentUser;
 
     if (user == null) {
@@ -24,6 +24,7 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
+        centerTitle: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
@@ -43,15 +44,31 @@ class ProfileScreen extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: AppColors.primaryContainer,
-                  child: Text(
-                    user.initials,
-                    style: const TextStyle(
-                      fontSize: 36,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppColors.primary, AppColors.primaryLight],
+                    ),
+                    boxShadow: AppColors.mediumShadow,
+                  ),
+                  padding: const EdgeInsets.all(3),
+                  child: CircleAvatar(
+                    radius: 48,
+                    backgroundColor: AppColors.surface,
+                    child: CircleAvatar(
+                      radius: 45,
+                      backgroundColor: AppColors.primaryContainer,
+                      child: Text(
+                        user.initials,
+                        style: const TextStyle(
+                          fontSize: 32,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -79,12 +96,16 @@ class ProfileScreen extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.warning.withOpacity(0.1),
+                      color: AppColors.warningContainer,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Text(
                       'Guest Mode',
-                      style: TextStyle(color: AppColors.warning, fontSize: 12),
+                      style: TextStyle(
+                        color: AppColors.warning,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
               ],
@@ -94,30 +115,40 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 32),
 
           // Stats
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _ProfileStat(
-                label: 'Bookings',
-                value: '${bookingService.bookings.length}',
-                icon: Icons.book_online_rounded,
-              ),
-              _ProfileStat(
-                label: 'Requests',
-                value: '${bookingService.serviceRequests.length}',
-                icon: Icons.request_page_rounded,
-              ),
-              _ProfileStat(
-                label: 'Reviews',
-                value: '0',
-                icon: Icons.reviews_rounded,
-              ),
-            ],
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: AppColors.softShadow,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _ProfileStat(
+                  label: 'Bookings',
+                  value: '${bookingService.bookings.length}',
+                  icon: Icons.book_online_rounded,
+                ),
+                Container(width: 1, height: 40, color: AppColors.border),
+                _ProfileStat(
+                  label: 'Requests',
+                  value: '${bookingService.serviceRequests.length}',
+                  icon: Icons.request_page_rounded,
+                ),
+                Container(width: 1, height: 40, color: AppColors.border),
+                _ProfileStat(
+                  label: 'Reviews',
+                  value: '0',
+                  icon: Icons.reviews_rounded,
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 32),
 
-          // Menu Items
+          // Settings
           const Text(
             'Settings',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -137,6 +168,22 @@ class ProfileScreen extends StatelessWidget {
             icon: Icons.notifications_rounded,
             title: 'Notifications',
             onTap: () => context.go('/notifications'),
+          ),
+          // Dark Mode Toggle
+          Card(
+            margin: const EdgeInsets.only(bottom: 4),
+            child: SwitchListTile(
+              secondary: Icon(
+                themeService.isDarkMode
+                    ? Icons.dark_mode_rounded
+                    : Icons.light_mode_rounded,
+                color: AppColors.primary,
+              ),
+              title: const Text('Dark Mode'),
+              subtitle: const Text('Switch between light and dark theme'),
+              value: themeService.isDarkMode,
+              onChanged: (_) => themeService.toggleTheme(),
+            ),
           ),
           _ProfileMenuItem(
             icon: Icons.security_rounded,
@@ -184,7 +231,7 @@ class ProfileScreen extends StatelessWidget {
             child: Text(
               'WorkLink v1.0.0',
               style: TextStyle(
-                color: AppColors.textHint.withOpacity(0.5),
+                color: AppColors.textHint.withValues(alpha: 0.5),
                 fontSize: 12,
               ),
             ),

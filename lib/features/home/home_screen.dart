@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/constants.dart';
+import '../../app/providers.dart';
 import '../../services/auth_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
 
   const HomeScreen({super.key, required this.navigationShell});
 
   @override
-  Widget build(BuildContext context) {
-    final authService = context.watch<AuthService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authService = ref.watch(authServiceProvider);
     final role = authService.currentRole;
 
     return Scaffold(

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
 import '../../core/utils.dart';
-import '../../services/chat_service.dart';
+import '../../app/providers.dart';
 
-class ChatListScreen extends StatelessWidget {
+class ChatListScreen extends ConsumerWidget {
   const ChatListScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final chatService = context.watch<ChatService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final chatService = ref.watch(chatServiceProvider);
     final chats = chatService.chats;
 
     return Scaffold(

@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
 import '../../core/utils.dart';
+import '../../core/widgets/empty_state.dart';
 import '../../models/professional_model.dart';
 import '../../services/professional_service.dart';
+import '../../app/providers.dart';
 
-class ProfessionalListScreen extends StatefulWidget {
+class ProfessionalListScreen extends ConsumerStatefulWidget {
   const ProfessionalListScreen({super.key});
 
   @override
-  State<ProfessionalListScreen> createState() => _ProfessionalListScreenState();
+  ConsumerState<ProfessionalListScreen> createState() =>
+      _ProfessionalListScreenState();
 }
 
-class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
+class _ProfessionalListScreenState
+    extends ConsumerState<ProfessionalListScreen> {
   final TextEditingController _searchController = TextEditingController();
   bool _showFilters = false;
 
@@ -25,7 +29,7 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final professionalService = context.watch<ProfessionalService>();
+    final professionalService = ref.watch(professionalServiceProvider);
     final professionals = professionalService.professionals;
     final featured = professionalService.featuredProfessionals;
 
@@ -35,11 +39,10 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
           // App Bar
           SliverAppBar(
             pinned: true,
-            expandedHeight: 120,
+            expandedHeight: 140,
             backgroundColor: AppColors.surface,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                padding: const EdgeInsets.fromLTRB(20, 60, 20, 0),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -49,31 +52,43 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
                 ),
                 child: SafeArea(
                   bottom: false,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              'Discover\nProfessionals',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Discover',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Professionals',
+                                style: TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.notifications_outlined,
-                              color: Colors.white,
-                            ),
-                            onPressed: () => context.go('/notifications'),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.notifications_outlined,
+                            color: Colors.white,
                           ),
-                        ],
-                      ),
-                    ],
+                          onPressed: () => context.go('/notifications'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -109,27 +124,64 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: Text(
-                '${professionals.length} professionals found',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
+              child: Row(
+                children: [
+                  Text(
+                    '${professionals.length} professionals found',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Icons.verified_rounded,
+                    size: 16,
+                    color: AppColors.success.withValues(alpha: 0.7),
+                  ),
+                  const SizedBox(width: 4),
+                  const Text(
+                    'Verified',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
 
           // Professional List
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                if (index >= professionals.length) return null;
-                return _buildProfessionalCard(context, professionals[index]);
-              }, childCount: professionals.length),
+          if (professionals.isEmpty)
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 300,
+                child: EmptyState(
+                  icon: Icons.search_off_rounded,
+                  title: 'No professionals found',
+                  subtitle: 'Try adjusting your search or filters',
+                  actionLabel: 'Clear Filters',
+                  onAction: () {
+                    professionalService.setSearchQuery('');
+                    professionalService.setSelectedCategory('');
+                    _searchController.clear();
+                  },
+                ),
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  if (index >= professionals.length) return null;
+                  return _buildProfessionalCard(context, professionals[index]);
+                }, childCount: professionals.length),
+              ),
             ),
-          ),
 
           // Bottom padding
           const SliverToBoxAdapter(child: SizedBox(height: 16)),
@@ -181,6 +233,12 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
         return Icons.format_paint_rounded;
       case 'Appliance Repair':
         return Icons.build_rounded;
+      case 'AC Repair':
+        return Icons.ac_unit_rounded;
+      case 'Gardening':
+        return Icons.yard_rounded;
+      case 'Construction':
+        return Icons.construction_rounded;
       default:
         return Icons.work_rounded;
     }
@@ -193,12 +251,15 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border.withOpacity(0.5)),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Sort by', style: TextStyle(fontWeight: FontWeight.w600)),
+          const Text(
+            'Sort by',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
@@ -242,11 +303,7 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
           child: Row(
             children: [
-              const Icon(
-                Icons.star_rounded,
-                color: AppColors.warning,
-                size: 20,
-              ),
+              const Icon(Icons.star_rounded, color: AppColors.accent, size: 22),
               const SizedBox(width: 8),
               const Text(
                 'Featured Professionals',
@@ -293,7 +350,7 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -306,7 +363,7 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
               children: [
                 CircleAvatar(
                   radius: 28,
-                  backgroundColor: Colors.white.withOpacity(0.2),
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
                   child: Text(
                     professional.name[0].toUpperCase(),
                     style: const TextStyle(
@@ -346,7 +403,7 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
               professional.category,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
             const Spacer(),
@@ -354,7 +411,7 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
               children: [
                 const Icon(
                   Icons.star_rounded,
-                  color: AppColors.warning,
+                  color: AppColors.accent,
                   size: 18,
                 ),
                 const SizedBox(width: 4),
@@ -369,13 +426,13 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
                 Text(
                   '(${professional.reviewCount})',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 12,
                   ),
                 ),
                 const Spacer(),
                 Text(
-                  AppUtils.formatCurrency(professional.hourlyRate),
+                  '${AppUtils.formatCurrency(professional.hourlyRate)}/hr',
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -403,16 +460,28 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Avatar
-              CircleAvatar(
-                radius: 32,
-                backgroundColor: AppColors.primaryContainer,
-                child: Text(
-                  professional.name[0].toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 24,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
+              // Avatar with gradient ring
+              Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: professional.isVerified
+                      ? LinearGradient(
+                          colors: [AppColors.primary, AppColors.secondary],
+                        )
+                      : null,
+                  color: professional.isVerified ? null : AppColors.border,
+                ),
+                child: CircleAvatar(
+                  radius: 30,
+                  backgroundColor: AppColors.primaryContainer,
+                  child: Text(
+                    professional.name[0].toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 22,
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -425,12 +494,15 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          professional.name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                        Flexible(
+                          child: Text(
+                            professional.name,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                         ),
                         if (professional.isVerified)
@@ -458,7 +530,7 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
                         const Icon(
                           Icons.star_rounded,
                           size: 16,
-                          color: AppColors.warning,
+                          color: AppColors.accent,
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -469,13 +541,19 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
                           ),
                         ),
                         Text(
-                          ' (${professional.reviewCount} reviews)',
+                          ' (${professional.reviewCount})',
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.textHint,
                           ),
                         ),
                         const SizedBox(width: 12),
+                        const Icon(
+                          Icons.work_rounded,
+                          size: 14,
+                          color: AppColors.textHint,
+                        ),
+                        const SizedBox(width: 4),
                         Text(
                           '${professional.jobCount}+ jobs',
                           style: const TextStyle(
@@ -505,25 +583,45 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
                     '/hr',
                     style: TextStyle(fontSize: 11, color: AppColors.textHint),
                   ),
-                  const SizedBox(height: 4),
-                  if (professional.isOnline)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.success.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        'Online',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: AppColors.success,
-                        ),
-                      ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
                     ),
+                    decoration: BoxDecoration(
+                      color: professional.isOnline
+                          ? AppColors.success.withValues(alpha: 0.1)
+                          : AppColors.surfaceVariant,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: professional.isOnline
+                                ? AppColors.success
+                                : AppColors.textHint,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          professional.isOnline ? 'Online' : 'Offline',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: professional.isOnline
+                                ? AppColors.success
+                                : AppColors.textHint,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -587,11 +685,18 @@ class _SearchHeaderDelegate extends SliverPersistentHeaderDelegate {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
+              color: _isFilterActive
+                  ? AppColors.primaryContainer
+                  : AppColors.surfaceVariant,
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
-              icon: const Icon(Icons.tune_rounded),
+              icon: Icon(
+                Icons.tune_rounded,
+                color: _isFilterActive
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
+              ),
               onPressed: onFilterTap,
             ),
           ),
@@ -599,6 +704,8 @@ class _SearchHeaderDelegate extends SliverPersistentHeaderDelegate {
       ),
     );
   }
+
+  bool get _isFilterActive => false;
 
   @override
   double get maxExtent => 72;
@@ -630,14 +737,11 @@ class _CategoryChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         margin: const EdgeInsets.only(right: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surfaceVariant,
+          gradient: isSelected
+              ? const LinearGradient(colors: AppColors.primaryGradient)
+              : null,
+          color: isSelected ? null : AppColors.surfaceVariant,
           borderRadius: BorderRadius.circular(24),
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? AppColors.primary : AppColors.border,
-              width: 2,
-            ),
-          ),
         ),
         child: Row(
           children: [

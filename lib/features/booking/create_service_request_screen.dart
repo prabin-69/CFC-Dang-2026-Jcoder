@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/colors.dart';
 import '../../core/constants.dart';
 import '../../core/utils.dart';
-import '../../services/auth_service.dart';
-import '../../services/booking_service.dart';
+import '../../app/providers.dart';
 
-class CreateServiceRequestScreen extends StatefulWidget {
+class CreateServiceRequestScreen extends ConsumerStatefulWidget {
   const CreateServiceRequestScreen({super.key});
 
   @override
-  State<CreateServiceRequestScreen> createState() =>
+  ConsumerState<CreateServiceRequestScreen> createState() =>
       _CreateServiceRequestScreenState();
 }
 
 class _CreateServiceRequestScreenState
-    extends State<CreateServiceRequestScreen> {
+    extends ConsumerState<CreateServiceRequestScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -68,7 +67,7 @@ class _CreateServiceRequestScreenState
 
     setState(() => _isLoading = true);
 
-    final bookingService = context.read<BookingService>();
+    final bookingService = ref.read(bookingServiceProvider);
     await bookingService.createServiceRequest(
       category: _selectedCategory,
       title: _titleController.text,
@@ -87,7 +86,7 @@ class _CreateServiceRequestScreenState
 
   @override
   Widget build(BuildContext context) {
-    final authService = context.watch<AuthService>();
+    final authService = ref.watch(authServiceProvider);
 
     // Guest guard
     if (authService.guardAction(context, AppConstants.actionCreateRequest)) {

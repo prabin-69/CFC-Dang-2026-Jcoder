@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
 import '../../core/utils.dart';
-import '../../services/notification_service.dart';
+import '../../app/providers.dart';
 
-class NotificationScreen extends StatelessWidget {
+class NotificationScreen extends ConsumerWidget {
   const NotificationScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final notificationService = context.watch<NotificationService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notificationService = ref.watch(notificationServiceProvider);
     final notifications = notificationService.notifications;
 
     return Scaffold(
@@ -76,7 +76,7 @@ class NotificationScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: _getNotifColor(
                                 notification.type,
-                              ).withOpacity(0.1),
+                              ).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(

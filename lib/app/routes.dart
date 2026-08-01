@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../core/constants.dart';
-import '../services/auth_service.dart';
+import '../app/providers.dart';
 import '../features/splash/splash_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/auth/auth_screen.dart';
@@ -60,7 +60,9 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: '/home',
               builder: (context, state) {
-                final authService = context.watch<AuthService>();
+                final authService = ProviderScope.containerOf(
+                  context,
+                ).read(authServiceProvider);
                 final role = authService.currentRole;
                 if (role == AppConstants.roleProfessional ||
                     role == AppConstants.roleBusiness) {

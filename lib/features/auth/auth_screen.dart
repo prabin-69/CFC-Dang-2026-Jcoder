@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
-import '../../services/auth_service.dart';
+import '../../app/providers.dart';
 
-class AuthScreen extends StatefulWidget {
+class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
 
   @override
-  State<AuthScreen> createState() => _AuthScreenState();
+  ConsumerState<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
+class _AuthScreenState extends ConsumerState<AuthScreen> {
   final _phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String _countryCode = '+977';
@@ -34,7 +34,7 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> _sendOtp() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final authService = context.read<AuthService>();
+    final authService = ref.read(authServiceProvider);
     await authService.sendOtp('$_countryCode${_phoneController.text}');
 
     if (mounted) {
@@ -47,7 +47,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authService = context.watch<AuthService>();
+    final authService = ref.watch(authServiceProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -67,7 +67,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Icon(
@@ -199,7 +199,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
                 OutlinedButton.icon(
                   onPressed: () {
-                    context.read<AuthService>().enterGuestMode();
+                    ref.read(authServiceProvider).enterGuestMode();
                     context.go('/home');
                   },
                   icon: const Icon(Icons.person_outline_rounded),

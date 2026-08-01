@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
 import '../../core/utils.dart';
-import '../../services/booking_service.dart';
+import '../../app/providers.dart';
 
-class BookingDetailScreen extends StatelessWidget {
+class BookingDetailScreen extends ConsumerWidget {
   final String bookingId;
 
   const BookingDetailScreen({super.key, required this.bookingId});
 
   @override
-  Widget build(BuildContext context) {
-    final bookingService = context.watch<BookingService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bookingService = ref.watch(bookingServiceProvider);
     final booking = bookingService.getBookingById(bookingId);
 
     if (booking == null) {
@@ -31,7 +31,9 @@ class BookingDetailScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: AppUtils.getStatusColor(booking.status).withOpacity(0.1),
+              color: AppUtils.getStatusColor(
+                booking.status,
+              ).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -217,7 +219,7 @@ class BookingDetailScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.success.withOpacity(0.1),
+                color: AppColors.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
@@ -243,7 +245,7 @@ class BookingDetailScreen extends StatelessWidget {
                         Text(
                           'Thank you for using WorkLink. We hope you enjoyed the service.',
                           style: TextStyle(
-                            color: AppColors.success.withOpacity(0.7),
+                            color: AppColors.success.withValues(alpha: 0.7),
                             fontSize: 13,
                           ),
                         ),

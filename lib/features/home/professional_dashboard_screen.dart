@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
 import '../../core/utils.dart';
-import '../../services/auth_service.dart';
-import '../../services/booking_service.dart';
-import '../../services/chat_service.dart';
-import '../../services/notification_service.dart';
+import '../../app/providers.dart';
 
-class ProfessionalDashboardScreen extends StatelessWidget {
+class ProfessionalDashboardScreen extends ConsumerWidget {
   const ProfessionalDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final authService = context.watch<AuthService>();
-    final bookingService = context.watch<BookingService>();
-    final chatService = context.watch<ChatService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authService = ref.watch(authServiceProvider);
+    final bookingService = ref.watch(bookingServiceProvider);
+    final chatService = ref.watch(chatServiceProvider);
     final user = authService.currentUser;
 
     final todayBookings = bookingService.bookings
@@ -67,7 +64,9 @@ class ProfessionalDashboardScreen extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 24,
-                            backgroundColor: Colors.white.withOpacity(0.2),
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.2,
+                            ),
                             child: Text(
                               (user?.name ?? 'P')[0].toUpperCase(),
                               style: const TextStyle(
@@ -94,7 +93,7 @@ class ProfessionalDashboardScreen extends StatelessWidget {
                                   'You have ${todayBookings.length} job(s) today',
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: Colors.white.withOpacity(0.8),
+                                    color: Colors.white.withValues(alpha: 0.8),
                                   ),
                                 ),
                               ],
@@ -109,8 +108,8 @@ class ProfessionalDashboardScreen extends StatelessWidget {
                                 ),
                                 onPressed: () => context.go('/notifications'),
                               ),
-                              if (context
-                                  .watch<NotificationService>()
+                              if (ref
+                                  .watch(notificationServiceProvider)
                                   .notifications
                                   .any((n) => !n.isRead))
                                 Positioned(
@@ -166,7 +165,9 @@ class ProfessionalDashboardScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border.withOpacity(0.5)),
+                border: Border.all(
+                  color: AppColors.border.withValues(alpha: 0.5),
+                ),
               ),
               child: Row(
                 children: [
@@ -178,7 +179,7 @@ class ProfessionalDashboardScreen extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.success.withOpacity(0.4),
+                          color: AppColors.success.withValues(alpha: 0.4),
                           blurRadius: 8,
                         ),
                       ],
@@ -209,7 +210,7 @@ class ProfessionalDashboardScreen extends StatelessWidget {
                   Switch(
                     value: true,
                     onChanged: (v) {},
-                    activeColor: AppColors.success,
+                    activeThumbColor: AppColors.success,
                   ),
                 ],
               ),
@@ -317,7 +318,7 @@ class ProfessionalDashboardScreen extends StatelessWidget {
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: AppColors.border.withOpacity(0.5),
+                          color: AppColors.border.withValues(alpha: 0.5),
                         ),
                       ),
                       child: Column(
@@ -455,7 +456,9 @@ class ProfessionalDashboardScreen extends StatelessWidget {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.warning.withOpacity(0.1),
+                                  color: AppColors.warning.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Text(
@@ -604,7 +607,10 @@ class _QuickStat extends StatelessWidget {
         ),
         Text(
           label,
-          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.7),
+            fontSize: 12,
+          ),
         ),
       ],
     );
@@ -637,7 +643,10 @@ class _EarningsStat extends StatelessWidget {
         ),
         Text(
           label,
-          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11),
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.7),
+            fontSize: 11,
+          ),
         ),
       ],
     );

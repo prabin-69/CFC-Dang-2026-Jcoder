@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 import '../../core/colors.dart';
 import '../../core/utils.dart';
+import '../../app/providers.dart';
 import '../../services/ai_service.dart';
-import '../../services/professional_service.dart';
 import 'widgets/ai_message_bubble.dart';
 import 'widgets/ai_quick_suggestions.dart';
 
-class AiAssistantScreen extends StatefulWidget {
+class AiAssistantScreen extends ConsumerStatefulWidget {
   const AiAssistantScreen({super.key});
 
   @override
-  State<AiAssistantScreen> createState() => _AiAssistantScreenState();
+  ConsumerState<AiAssistantScreen> createState() => _AiAssistantScreenState();
 }
 
-class _AiAssistantScreenState extends State<AiAssistantScreen> {
+class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   final _textController = TextEditingController();
   final _scrollController = ScrollController();
   final _picker = ImagePicker();
@@ -47,8 +47,8 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
   }
 
   Future<void> _sendMessage(String text) async {
-    final aiService = context.read<AIAssistantService>();
-    final professionals = context.read<ProfessionalService>().professionals;
+    final aiService = ref.read(aiAssistantServiceProvider);
+    final professionals = ref.read(professionalServiceProvider).professionals;
     await aiService.sendMessage(text, professionals: professionals);
     _scrollToBottom();
   }
@@ -61,8 +61,8 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     );
     if (image == null) return;
 
-    final aiService = context.read<AIAssistantService>();
-    final professionals = context.read<ProfessionalService>().professionals;
+    final aiService = ref.read(aiAssistantServiceProvider);
+    final professionals = ref.read(professionalServiceProvider).professionals;
     await aiService.sendImageMessage(image.path, professionals: professionals);
     _scrollToBottom();
   }
@@ -71,7 +71,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     switch (type) {
       case AiActionType.viewProfessionals:
         if (payload != null) {
-          context.read<ProfessionalService>().setSelectedCategory(payload);
+          ref.read(professionalServiceProvider).setSelectedCategory(payload);
         }
         context.go('/home');
         break;
@@ -88,7 +88,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final aiService = context.watch<AIAssistantService>();
+    final aiService = ref.watch(aiAssistantServiceProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -214,7 +214,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             width: 8,
             height: 8,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(value),
+              color: AppColors.primary.withValues(alpha: value),
               shape: BoxShape.circle,
             ),
           );
@@ -230,7 +230,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
         color: AppColors.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
